@@ -1,3 +1,4 @@
+const Booking = require("../models/Booking");
 const Event = require("../models/Event");
 
 // Add new event (admin only)
@@ -26,6 +27,10 @@ const getEvents = async (req, res) => {
 // Book an event
 const bookEvent = async (req, res) => {
   try {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
@@ -33,17 +38,31 @@ const bookEvent = async (req, res) => {
       return res.status(400).json({ message: "No seats available" });
     }
 
+    const alreadyBooked = await Booking.findOne({ eventId: event._id, email });
+    if (alreadyBooked) {
+      return res
+        .status(400)
+        .json({ message: "You have already booked this event" });
+    }
+
+    const booking = new Booking({
+      email,
+      eventId: event._id,
+    });
+    await booking.save();
+
     event.numberOfSeats -= 1;
     await event.save();
 
     res.json({ message: "Event booked successfully", event });
   } catch (err) {
-    res.status(500).json({ message: "Error booking event" });
+    res
+      .status(500)
+      .json({ message: "Error booking event", error: err.message });
   }
 };
 
-// getTopEvents
-
+// get featured Events
 const getFeaturedEvents = async (req, res) => {
   try {
     const topEvents = await Event.find()
@@ -57,22 +76,40 @@ const getFeaturedEvents = async (req, res) => {
   }
 };
 
-
 // get all categories
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Event.distinct('category');
+    const categories = await Event.distinct("category");
     res.status(200).json(categories);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch categories", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch categories", error: err.message });
   }
 };
 
+const getBookedEvents = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const bookings = await Booking.find({ email }).populate("eventId");
+
+    const bookedEvents = bookings.map((booking) => booking.eventId);
+    res.json(bookedEvents);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch booked events", error: err.message });
+  }
+};
 
 module.exports = {
   addEvent,
   bookEvent,
   getEvents,
   getFeaturedEvents,
-  getAllCategories
+  getAllCategories,
+  getBookedEvents,
 };

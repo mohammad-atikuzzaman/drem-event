@@ -6,6 +6,7 @@ const {
   getEvents,
   getAllCategories,
   getFeaturedEvents,
+  getBookedEvents,
 } = require("../controllers/eventController");
 const authorizeAdmin = require("../middleware/authorizeAdmin");
 
@@ -23,5 +24,8 @@ router.get("/featured", getFeaturedEvents);
 
 // Book an event (any user)
 router.post("/book/:id", bookEvent);
+
+// get booked event by user
+router.get("/booked", getBookedEvents)
 
 module.exports = router;
