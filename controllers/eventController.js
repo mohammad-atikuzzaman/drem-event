@@ -45,9 +45,9 @@ const getEventById = async (req, res) => {
 // Book an event
 const bookEvent = async (req, res) => {
   try {
-    const { email, noOfSit, phone } = req.body;
+    const { email, noOfSit, phone, name } = req.body;
 
-    if (!email || !phone || !noOfSit) {
+    if (!email || !phone || !noOfSit ) {
       return res
         .status(400)
         .json({ message: "Email, phone, and number of seats are required" });
@@ -73,6 +73,7 @@ const bookEvent = async (req, res) => {
       email,
       phone,
       noOfSit,
+      name,
       eventId: event._id,
     });
     await booking.save();
