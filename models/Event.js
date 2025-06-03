@@ -1,5 +1,3 @@
-
-
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
@@ -15,7 +13,7 @@ const eventSchema = new mongoose.Schema(
     // New fields based on your description:
     organizer: {
       name: { type: String, required: true },
-      contact: { type: String, required: true }, // Can be email/phone/etc.
+      contact: { type: String, required: true },
     },
     registrationDeadline: { type: Date, required: true },
     registrationFee: { type: Number, required: true, min: 0 },

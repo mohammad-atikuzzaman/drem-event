@@ -143,6 +143,7 @@ const getAllCategories = async (req, res) => {
   }
 };
 
+// get the booked event of user
 const getBookedEvents = async (req, res) => {
   try {
     const { email } = req.query;
