@@ -56,6 +56,37 @@ const getEventById = async (req, res) => {
   }
 };
 
+// get event by search
+const getEventBySearch = async (req, res) => {
+  const { searchText } = req.query;
+
+  if (!searchText) {
+    return res.status(400).json({ message: "Search text is required" });
+  }
+
+  try {
+    // Create a case-insensitive regex for the search term
+    const regex = new RegExp(searchText, "i");
+
+    // Search in multiple fields using $or
+    const events = await Event.find({
+      $or: [
+        { eventName: regex },
+        { location: regex },
+        { category: regex },
+        { description: regex },
+        { "organizer.name": regex },
+        { "organizer.contact": regex },
+      ],
+    });
+
+    res.json(events);
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // Book an event
 const bookEvent = async (req, res) => {
   try {
@@ -179,6 +210,7 @@ module.exports = {
   addEvent,
   bookEvent,
   getEvents,
+  getEventBySearch,
   getFeaturedEvents,
   getAllCategories,
   getBookedEvents,
