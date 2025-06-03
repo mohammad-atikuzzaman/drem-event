@@ -1,14 +1,24 @@
 const Booking = require("../models/Booking");
 const Event = require("../models/Event");
+const User = require("../models/User");
 
 // Add new event (admin only)
 const addEvent = async (req, res) => {
   try {
-    const event = new Event(req.body);
+    const { userD, ...eventData } = req.body;
+
+    const user = await User.findOne({ email: userD });
+    if (!user || user.role !== "admin") {
+      return res.status(401).json({ message: "Only Admin Access" });
+    }
+
+    const event = new Event(eventData);
     await event.save();
-    res.status(201).json(event);
+
+    return res.status(201).json(event);
   } catch (err) {
-    res.status(500).json({ message: "Failed to add event" });
+    console.error("Add Event Error:", err);
+    return res.status(500).json({ message: "Failed to add event" });
   }
 };
 
@@ -47,7 +57,7 @@ const bookEvent = async (req, res) => {
   try {
     const { email, noOfSit, phone, name } = req.body;
 
-    if (!email || !phone || !noOfSit ) {
+    if (!email || !phone || !noOfSit) {
       return res
         .status(400)
         .json({ message: "Email, phone, and number of seats are required" });
