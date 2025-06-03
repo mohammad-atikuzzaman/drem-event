@@ -1,7 +1,8 @@
 const Reviews = require("../models/Reviews");
 
 const submitReview = async (req, res) => {
-  const { eventId, userEmail, userName, userPhoto, rating, reviewText  } = req.body;
+  const { eventId, userEmail, userName, userPhoto, rating, reviewText } =
+    req.body;
   const data = { eventId, userEmail, userName, userPhoto, rating, reviewText };
   //   return console.log(data);
 
@@ -38,7 +39,7 @@ const submitReview = async (req, res) => {
 
 const getAllReviews = async (req, res) => {
   try {
-    const reviews = await Reviews.find().sort({ createdAt: -1 }); // Sort newest first
+    const reviews = await Reviews.find().sort({ createdAt: -1 }).limit(10); // Sort newest first
     res.status(200).json(reviews);
   } catch (error) {
     console.error("Error fetching reviews:", error);
@@ -48,5 +49,5 @@ const getAllReviews = async (req, res) => {
 
 module.exports = {
   submitReview,
-  getAllReviews
+  getAllReviews,
 };
