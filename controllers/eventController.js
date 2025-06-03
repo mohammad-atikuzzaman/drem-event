@@ -9,7 +9,11 @@ const addEvent = async (req, res) => {
 
     const user = await User.findOne({ email: userD });
     if (!user || user.role !== "admin") {
-      return res.status(401).json({ message: "Only Admin Access" });
+      return res.json({
+        status: "error",
+        code: 403,
+        message: "Access denied. Admins only.",
+      });
     }
 
     const event = new Event(eventData);
